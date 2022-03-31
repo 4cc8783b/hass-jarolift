@@ -1,0 +1,35 @@
+send_raw:
+  description: Send raw data to JARO lift
+  fields:
+    packet:
+      description: The packet data to send
+send_command:
+  description: Send button press to JARO lift
+  fields:
+    group:
+      description: The JARO lift group to send the command to
+      example: '0x0001'
+    serial:
+      description: The serial of the addressed JARO lift
+      example: '0x106aa01'
+    button:
+      description: The button that was pressed on the remote
+      example: '0x2'
+learn:
+  description: Learn a new JARO lift
+  fields:
+    group:
+      description: The JARO lift group to send the command to
+      example: '0x0001'
+    serial:
+      description: The serial of the addressed JARO lift
+      example: '0x106aa01'
+clear:
+  description: Clear previously learned JARO lift
+  fields:
+    group:
+      description: The JARO lift group to send the command to
+      example: '0x0001'
+    serial:
+      description: The serial of the addressed JARO lift
+      example: '0x106aa01'

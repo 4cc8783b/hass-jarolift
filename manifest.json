@@ -1,0 +1,9 @@
+{
+    "domain": "jarolift",
+    "name": "Jarolift integration",
+    "dependencies": [],
+    "codeowners": [],
+    "requirements": [],
+    "iot_class": "assumed_state",
+    "version": "0.0.1"
+  }
