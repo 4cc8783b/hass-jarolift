@@ -10,7 +10,14 @@ but Wladi seems not in the position to support further more. Since there were so
 changes needed to the code (and will always be as home assistant evolves) this repository
 was set up to track changes.
 
-**Attention: The current implementation will stop working from Home Assistant 2022.2 onwards!**
+## Supported Home Assistant versions
+
+### Minimum HA version: 2021.3.4
+The integration was changed from the original one someday in the past. I don't remember when that was so the smallest supported version of Home Assistant may
+actually be an even smaller one.
+
+### Maximum HA version: 2021.12.10
+From 2022.2 onwards changes are needed to the implementation due to changes to the Home Assistant core code / classes.
 
 ## KeeLoq Encryption
 
@@ -18,9 +25,9 @@ Jarolift covers use [KeeLoq](https://en.wikipedia.org/wiki/KeeLoq) encryption he
 proprietary bit of knowledge needed to operate them (the manufacturer key which is used in the process
 of encrypting/decrypting data).
 
-**This repository does not and will not contain the secret manufacturer key**
+**This repository does not and will not contain the secret manufacturer key!**
 
-If you do not have the manufacturer key you should get it by using google ;-)
+If you do not have the manufacturer key you should get it by using Google or follow the linked original source from above ;-)
 
 ## Installation
 
@@ -42,6 +49,15 @@ jarolift:
   remote_entity_id: remote.broadlink_rm_proplus_remote # this id is from the device of the remote integration representing the remote to send command with
   MSB: '0x12345678' # Most significant bits of the manufacturer key (**0x12345678 is not the correct value!**)
   LSB: '0x87654321' # Least significant bits of the manufactorer key (**0x87654321 is not the correct value!**)
+```
+
+You can then use the new cover platform like this:
+```yaml
+- platform: jarolift
+  covers:
+    - name: 'Livingroom Main Cover'
+      group: '0x0001'
+      serial: '0x116ea01'
 ```
 
 Make sure Home Assistant can write a file in the config directory. The integration will write one to keep
