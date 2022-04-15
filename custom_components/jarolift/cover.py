@@ -6,7 +6,10 @@ import logging
 import voluptuous as vol
 
 from homeassistant.components.cover import (
-    CoverEntityFeature,
+    SUPPORT_OPEN,
+    SUPPORT_CLOSE,
+    SUPPORT_STOP,
+    SUPPORT_SET_TILT_POSITION,
     PLATFORM_SCHEMA,
     CoverDeviceClass,
     CoverEntity,
@@ -65,10 +68,10 @@ class JaroliftCover(CoverEntity):
         self._serial = serial
         self._hass = hass
         supported_features = 0
-        supported_features |= CoverEntityFeature.SET_TILT_POSITION
-        supported_features |= CoverEntityFeature.OPEN
-        supported_features |= CoverEntityFeature.CLOSE
-        supported_features |= CoverEntityFeature.STOP
+        supported_features |= SUPPORT_SET_TILT_POSITION
+        supported_features |= SUPPORT_OPEN
+        supported_features |= SUPPORT_CLOSE
+        supported_features |= SUPPORT_STOP
         self._attr_supported_features = supported_features
         self._attr_device_class = CoverDeviceClass.BLIND
 
