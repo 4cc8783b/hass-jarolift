@@ -12,12 +12,8 @@ was set up to track changes.
 
 ## Supported Home Assistant versions
 
-### Minimum HA version: 2021.3.4
-The integration was changed from the original one someday in the past. I don't remember when that was so the smallest supported version of Home Assistant may
-actually be an even smaller one.
-
-### Maximum HA version: 2021.12.10
-From 2022.2 onwards changes are needed to the implementation due to changes to the Home Assistant core code / classes.
+### Minimum HA version: 2022.2
+Older versions may be supported by tagged versions (see tags).
 
 ## KeeLoq Encryption
 
