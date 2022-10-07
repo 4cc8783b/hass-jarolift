@@ -136,7 +136,7 @@ def setup(hass, config):
         Counter = int(call.data.get("counter", "0x0000"), 16)
         if Counter == 0:
             packet = BuildPacket(Grouping, Serial, Button, RCounter, MSB, LSB, Hold)
-            WriteCounter(counter_file, RCounter + 1)
+            WriteCounter("counter_" + hex(Serial), RCounter + 1)
         else:
             packet = BuildPacket(Grouping, Serial, Button, Counter, MSB, LSB, Hold)
         hass.services.call(
@@ -149,7 +149,7 @@ def setup(hass, config):
         Grouping = int(call.data.get("group", "0x0001"), 16)
         Serial = int(call.data.get("serial", "0x106aa01"), 16)
         Button = int("0xa", 16)
-        RCounter = ReadCounter(counter_file)
+        RCounter = ReadCounter("counter_" + hex(Serial))
         Counter = int(call.data.get("counter", "0x0000"), 16)
         if Counter == 0:
             UsedCounter = RCounter
@@ -170,13 +170,13 @@ def setup(hass, config):
             {"entity_id": remote_entity_id, "command": [packet]},
         )
         if Counter == 0:
-            WriteCounter(counter_file, RCounter + 2)
+            WriteCounter("counter_" + hex(Serial), RCounter + 2)
 
     def handle_clear(call):
         Grouping = int(call.data.get("group", "0x0001"), 16)
         Serial = int(call.data.get("serial", "0x106aa01"), 16)
         Button = int("0xa", 16)
-        RCounter = ReadCounter(counter_file)
+        RCounter = ReadCounter("counter_" + hex(Serial))
         Counter = int(call.data.get("counter", "0x0000"), 16)
         if Counter == 0:
             UsedCounter = RCounter
@@ -209,7 +209,7 @@ def setup(hass, config):
             {"entity_id": remote_entity_id, "command": [packet]},
         )
         if Counter == 0:
-            WriteCounter(counter_file, RCounter + 8)
+            WriteCounter("counter_" + hex(Serial), RCounter + 8)
 
     hass.services.register(DOMAIN, "send_raw", handle_send_raw)
     hass.services.register(DOMAIN, "send_command", handle_send_command)
