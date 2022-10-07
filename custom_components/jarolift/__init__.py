@@ -96,8 +96,9 @@ def BuildPacket(Grouping, Serial, Button, Counter, MSB, LSB, Hold):
 
 
 def ReadCounter(counter_file):
-    if os.path.isfile(counter_file):
-        fo = open(counter_file, "r")
+    filename = counter_file
+    if os.path.isfile(filename):
+        fo = open(filename, "r")
         Counter = int(fo.readline())
         fo.close()
         return Counter
@@ -131,7 +132,7 @@ def setup(hass, config):
         Serial = int(call.data.get("serial", "0x106aa01"), 16)
         Button = int(call.data.get("button", "0x2"), 16)
         Hold = call.data.get("hold", False)
-        RCounter = ReadCounter(counter_file)
+        RCounter = ReadCounter("counter_" + hex(Serial))
         Counter = int(call.data.get("counter", "0x0000"), 16)
         if Counter == 0:
             packet = BuildPacket(Grouping, Serial, Button, RCounter, MSB, LSB, Hold)
