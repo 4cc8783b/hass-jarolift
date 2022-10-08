@@ -68,7 +68,7 @@ class JaroliftCover(CoverEntity):
         self._serial = serial
         self._hass = hass
         supported_features = 0
-        supported_features |= SUPPORT_SET_TILT_POSITION
+        #supported_features |= SUPPORT_SET_TILT_POSITION
         supported_features |= SUPPORT_OPEN
         supported_features |= SUPPORT_CLOSE
         supported_features |= SUPPORT_STOP
