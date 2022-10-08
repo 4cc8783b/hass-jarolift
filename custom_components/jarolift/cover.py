@@ -9,7 +9,7 @@ from homeassistant.components.cover import (
     SUPPORT_OPEN,
     SUPPORT_CLOSE,
     SUPPORT_STOP,
-    SUPPORT_SET_TILT_POSITION,
+#    SUPPORT_SET_TILT_POSITION,
     PLATFORM_SCHEMA,
     CoverDeviceClass,
     CoverEntity,
@@ -124,15 +124,15 @@ class JaroliftCover(CoverEntity):
             {"group": self._group, "serial": self._serial, "button": "0x4"},
         )
 
-    async def async_set_cover_tilt_position(self, **kwargs):
-        """Drive the cover to tilt position"""
-        await self._hass.services.async_call(
-            "jarolift",
-            "send_command",
-            {
-                "group": self._group,
-                "serial": self._serial,
-                "button": "0x4",
-                "hold": True,
-            },
-        )
+#    async def async_set_cover_tilt_position(self, **kwargs):
+#        """Drive the cover to tilt position"""
+#        await self._hass.services.async_call(
+#            "jarolift",
+#            "send_command",
+#            {
+#                "group": self._group,
+#                "serial": self._serial,
+#                "button": "0x4",
+#                "hold": True,
+#            },
+#        )
