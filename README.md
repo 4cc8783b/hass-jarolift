@@ -46,6 +46,7 @@ jarolift:
   MSB: '0x12345678' # Most significant bits of the manufacturer key (**0x12345678 is not the correct value!**)
   LSB: '0x87654321' # Least significant bits of the manufactorer key (**0x87654321 is not the correct value!**)
 ```
+Manufacturer key can be found on pastebin (just google it)
 
 You can then use the new cover platform like this:
 ```yaml
