@@ -10,7 +10,7 @@ import os.path
 
 COUNTER_FILENAME = "mycounter.txt"
 DOMAIN = "jarolift"
-_LOGGER = logging.getLogger(__name__)
+#_LOGGER = logging.getLogger(__name__)
 
 def bitRead(value, bit):
     return ((value) >> (bit)) & 0x01
@@ -108,7 +108,7 @@ def ReadCounter(counter_file, serial):
 
 def WriteCounter(counter_file, serial, Counter):
     filename = counter_file + hex(serial) + ".txt"
-    _LOGGER.warning("Writing to " + filename + ": " + str(Counter) )
+    #_LOGGER.warning("Writing to " + filename + ": " + str(Counter) )
     fo = open(filename, "w")
     fo.write(str(Counter))
     fo.close()
