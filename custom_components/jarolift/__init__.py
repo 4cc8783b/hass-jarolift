@@ -141,11 +141,14 @@ def setup(hass, config):
             WriteCounter(counter_file, Serial, RCounter + 1)
         else:
             packet = BuildPacket(Grouping, Serial, Button, Counter, MSB, LSB, Hold)
-        hass.services.call(
-            "remote",
-            "send_command",
-            {"entity_id": remote_entity_id, "command": [packet]},
-        )
+        # very ugly: send 4 times the same code
+        for i in range(0, 4):
+            hass.services.call(
+                "remote",
+                "send_command",
+                {"entity_id": remote_entity_id, "command": [packet]},
+            )
+            sleep(0.2)
 
     def handle_learn(call):
         Grouping = int(call.data.get("group", "0x0001"), 16)
