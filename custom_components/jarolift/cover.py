@@ -74,6 +74,7 @@ class JaroliftCover(CoverEntity):
         supported_features |= SUPPORT_STOP
         self._attr_supported_features = supported_features
         self._attr_device_class = CoverDeviceClass.BLIND
+        self._attr_unique_id = "jarolift_" + serial
 
     @property
     def serial(self):
