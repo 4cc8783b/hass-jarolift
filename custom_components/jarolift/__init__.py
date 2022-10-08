@@ -108,7 +108,7 @@ def ReadCounter(counter_file, serial):
 
 def WriteCounter(counter_file, serial, Counter):
     filename = counter_file + hex(serial) + ".txt"
-    _LOGGER.warning("Writing to " + filename + ": " + str(counter) )
+    _LOGGER.warning("Writing to " + filename + ": " + str(Counter) )
     fo = open(filename, "w")
     fo.write(str(Counter))
     fo.close()
