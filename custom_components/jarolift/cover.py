@@ -105,7 +105,7 @@ class JaroliftCover(CoverEntity):
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
-            {"group": self._group, "serial": self._serial, "button": "0x8"},
+            {"group": self._group, "serial": self._serial, "button": "0x2"},
         )
 
     async def async_open_cover(self, **kwargs):
@@ -113,7 +113,7 @@ class JaroliftCover(CoverEntity):
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
-            {"group": self._group, "serial": self._serial, "button": "0x2"},
+            {"group": self._group, "serial": self._serial, "button": "0x8"},
         )
 
     async def async_stop_cover(self, **kwargs):

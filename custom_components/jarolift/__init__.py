@@ -2,7 +2,7 @@
 Support a 'Jarolift' remote as a separate remote.
 Basically a proxy adding Keeloq encryption to commands sent via another remote then.
 """
-
+import logging
 import base64
 import binascii
 from time import sleep
@@ -10,7 +10,7 @@ import os.path
 
 COUNTER_FILENAME = "mycounter.txt"
 DOMAIN = "jarolift"
-
+_LOGGER = logging.getLogger(__name__)
 
 def bitRead(value, bit):
     return ((value) >> (bit)) & 0x01
@@ -107,7 +107,9 @@ def ReadCounter(counter_file, serial):
 
 
 def WriteCounter(counter_file, serial, Counter):
-    fo = open(counter_file + hex(serial) + ".txt", "w")
+    filename = counter_file + hex(serial) + ".txt"
+    _LOGGER.warning("Writing to " + filename ": " + str(counter) )
+    fo = open(filename, "w")
     fo.write(str(Counter))
     fo.close()
 
