@@ -67,6 +67,7 @@ class JaroliftCover(CoverEntity):
         self._group = group
         self._serial = serial
         self._hass = hass
+        self._isClosed = True
         supported_features = 0
         #supported_features |= SUPPORT_SET_TILT_POSITION
         supported_features |= SUPPORT_OPEN
@@ -99,10 +100,11 @@ class JaroliftCover(CoverEntity):
     @property
     def is_closed(self):
         """Return true if cover is closed."""
-        return None
+        return self._isClosed
 
     async def async_close_cover(self, **kwargs):
         """Close the cover."""
+        self._isClosed = True
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
@@ -111,6 +113,7 @@ class JaroliftCover(CoverEntity):
 
     async def async_open_cover(self, **kwargs):
         """Open the cover."""
+        self._isClosed = False
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
