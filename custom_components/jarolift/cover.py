@@ -13,6 +13,8 @@ from homeassistant.components.cover import (
     PLATFORM_SCHEMA,
     CoverDeviceClass,
     CoverEntity,
+    STATE_OPEN,
+    STATE_CLOSED,
 )
 
 from homeassistant.const import CONF_NAME
@@ -67,7 +69,7 @@ class JaroliftCover(CoverEntity):
         self._group = group
         self._serial = serial
         self._hass = hass
-        self._isClosed = True
+        self._isClosed = None
         supported_features = 0
         #supported_features |= SUPPORT_SET_TILT_POSITION
         supported_features |= SUPPORT_OPEN
@@ -101,6 +103,18 @@ class JaroliftCover(CoverEntity):
     def is_closed(self):
         """Return true if cover is closed."""
         return self._isClosed
+
+    @property
+    def current_cover_position(self):
+        """Return the current position of the cover.
+        None is unknown, 0 is closed, 255 is fully open.
+        """
+        if self._isClosed == True:
+            return 0
+        elif self._isClosed == False:
+            return 255
+        else:
+            return None
 
     async def async_close_cover(self, **kwargs):
         """Close the cover."""
