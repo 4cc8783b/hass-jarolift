@@ -122,6 +122,7 @@ class JaroliftCover(CoverEntity):
 
     async def async_stop_cover(self, **kwargs):
         """Stop the cover."""
+        self._isClosed = None
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
