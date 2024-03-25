@@ -54,9 +54,11 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     covers_conf = config.get(CONF_COVERS)
 
     for cover in covers_conf:
+        jc = JaroliftCover(cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], hass)
         covers.append(
-            JaroliftCover(cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], hass)
+            jc
         )
+        _LOGGER.debug("Adding new cover with the name: %s, group: %s, serial: %s and entity_id:", cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], jc._attr_unique_id)
     add_devices(covers)
 
 
@@ -77,7 +79,8 @@ class JaroliftCover(CoverEntity):
         supported_features |= SUPPORT_STOP
         self._attr_supported_features = supported_features
         self._attr_device_class = CoverDeviceClass.BLIND
-        self._attr_unique_id = "jarolift_" + serial
+        # Allowing to use the HA to emulate a sinlge remote controller for TDEF motors
+        self._attr_unique_id = "jarolift_" + serial + group
 
     @property
     def serial(self):
@@ -109,16 +112,19 @@ class JaroliftCover(CoverEntity):
         """Return the current position of the cover.
         None is unknown, 0 is closed, 255 is fully open.
         """
+        returnVaule = None
         if self._isClosed == True:
-            return 0
+            returnVaule = 0
         elif self._isClosed == False:
-            return 255
-        else:
-            return None
+            """The old maximum value was 255"""
+            returnVaule = 100
+        _LOGGER.debug("Returning position value: %s for the entity: %s with name: %s, group: %s, serial: %s", returnVaule, self._attr_unique_id, self._name,self._group, self._serial)
+        return returnVaule
 
     async def async_close_cover(self, **kwargs):
         """Close the cover."""
         self._isClosed = True
+        _LOGGER.debug("Calling the function close for the entity: %s with name: %s, group: %s, serial: %s", self._attr_unique_id, self._name,self._group, self._serial)
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
@@ -128,6 +134,7 @@ class JaroliftCover(CoverEntity):
     async def async_open_cover(self, **kwargs):
         """Open the cover."""
         self._isClosed = False
+        _LOGGER.debug("Calling the function open for the entity: %s with name: %s, group: %s, serial: %s", self._attr_unique_id, self._name,self._group, self._serial)
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
@@ -137,6 +144,7 @@ class JaroliftCover(CoverEntity):
     async def async_stop_cover(self, **kwargs):
         """Stop the cover."""
         self._isClosed = None
+        _LOGGER.debug("Calling the function open for the entity: %s with name: %s, group: %s, serial: %s", self._attr_unique_id, self._name,self._group, self._serial)
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
