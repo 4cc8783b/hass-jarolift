@@ -2,7 +2,7 @@
 Support a 'Jarolift' remote as a separate remote.
 Basically a proxy adding Keeloq encryption to commands sent via another remote then.
 """
-
+import logging
 import base64
 import binascii
 from time import sleep
@@ -10,7 +10,7 @@ import os.path
 
 COUNTER_FILENAME = "mycounter.txt"
 DOMAIN = "jarolift"
-
+_LOGGER = logging.getLogger(__name__)
 
 def bitRead(value, bit):
     return ((value) >> (bit)) & 0x01
@@ -95,9 +95,10 @@ def BuildPacket(Grouping, Serial, Button, Counter, MSB, LSB, Hold):
     return "b64:" + packet.decode("utf-8")
 
 
-def ReadCounter(counter_file):
-    if os.path.isfile(counter_file):
-        fo = open(counter_file, "r")
+def ReadCounter(counter_file, serial):
+    filename = counter_file + hex(serial) + ".txt"
+    if os.path.isfile(filename):
+        fo = open(filename, "r")
         Counter = int(fo.readline())
         fo.close()
         return Counter
@@ -105,8 +106,10 @@ def ReadCounter(counter_file):
         return 0
 
 
-def WriteCounter(counter_file, Counter):
-    fo = open(counter_file, "w")
+def WriteCounter(counter_file, serial, Counter):
+    filename = counter_file + hex(serial) + ".txt"
+    _LOGGER.debug("Writing to counter file with the filenme: " + filename + " the counter value: " + str(Counter) )
+    fo = open(filename, "w")
     fo.write(str(Counter))
     fo.close()
 
@@ -116,7 +119,7 @@ def setup(hass, config):
     MSB = int(config["jarolift"]["MSB"], 16)
     LSB = int(config["jarolift"]["LSB"], 16)
 
-    counter_file = hass.config.path(COUNTER_FILENAME)
+    counter_file = hass.config.path("counter_")
 
     def handle_send_raw(call):
         packet = call.data.get("packet", "")
@@ -131,24 +134,27 @@ def setup(hass, config):
         Serial = int(call.data.get("serial", "0x106aa01"), 16)
         Button = int(call.data.get("button", "0x2"), 16)
         Hold = call.data.get("hold", False)
-        RCounter = ReadCounter(counter_file)
+        RCounter = ReadCounter(counter_file, Serial)
         Counter = int(call.data.get("counter", "0x0000"), 16)
         if Counter == 0:
             packet = BuildPacket(Grouping, Serial, Button, RCounter, MSB, LSB, Hold)
-            WriteCounter(counter_file, RCounter + 1)
+            WriteCounter(counter_file, Serial, RCounter + 1)
         else:
             packet = BuildPacket(Grouping, Serial, Button, Counter, MSB, LSB, Hold)
-        hass.services.call(
-            "remote",
-            "send_command",
-            {"entity_id": remote_entity_id, "command": [packet]},
-        )
+        # very ugly: send 4 times the same code
+        for i in range(0, 4):
+            hass.services.call(
+                "remote",
+                "send_command",
+                {"entity_id": remote_entity_id, "command": [packet]},
+            )
+            sleep(0.2)
 
     def handle_learn(call):
         Grouping = int(call.data.get("group", "0x0001"), 16)
         Serial = int(call.data.get("serial", "0x106aa01"), 16)
         Button = int("0xa", 16)
-        RCounter = ReadCounter(counter_file)
+        RCounter = ReadCounter(counter_file, Serial)
         Counter = int(call.data.get("counter", "0x0000"), 16)
         if Counter == 0:
             UsedCounter = RCounter
@@ -169,13 +175,13 @@ def setup(hass, config):
             {"entity_id": remote_entity_id, "command": [packet]},
         )
         if Counter == 0:
-            WriteCounter(counter_file, RCounter + 2)
+            WriteCounter(counter_file, Serial, RCounter + 2)
 
     def handle_clear(call):
         Grouping = int(call.data.get("group", "0x0001"), 16)
         Serial = int(call.data.get("serial", "0x106aa01"), 16)
         Button = int("0xa", 16)
-        RCounter = ReadCounter(counter_file)
+        RCounter = ReadCounter(counter_file, Serial)
         Counter = int(call.data.get("counter", "0x0000"), 16)
         if Counter == 0:
             UsedCounter = RCounter
@@ -208,7 +214,7 @@ def setup(hass, config):
             {"entity_id": remote_entity_id, "command": [packet]},
         )
         if Counter == 0:
-            WriteCounter(counter_file, RCounter + 8)
+            WriteCounter(counter_file, Serial, RCounter + 8)
 
     hass.services.register(DOMAIN, "send_raw", handle_send_raw)
     hass.services.register(DOMAIN, "send_command", handle_send_command)
