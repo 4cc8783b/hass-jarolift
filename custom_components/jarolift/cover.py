@@ -6,9 +6,7 @@ import logging
 import voluptuous as vol
 
 from homeassistant.components.cover import (
-    SUPPORT_OPEN,
-    SUPPORT_CLOSE,
-    SUPPORT_STOP,
+    CoverEntityFeature,
 #    SUPPORT_SET_TILT_POSITION,
     PLATFORM_SCHEMA,
     CoverDeviceClass,
@@ -54,11 +52,9 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     covers_conf = config.get(CONF_COVERS)
 
     for cover in covers_conf:
-        jc = JaroliftCover(cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], hass)
         covers.append(
-            jc
+            JaroliftCover(cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], hass)
         )
-        _LOGGER.debug("Adding new cover with the name: %s, group: %s, serial: %s and entity_id:", cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], jc._attr_unique_id)
     add_devices(covers)
 
 
@@ -74,13 +70,12 @@ class JaroliftCover(CoverEntity):
         self._isClosed = None
         supported_features = 0
         #supported_features |= SUPPORT_SET_TILT_POSITION
-        supported_features |= SUPPORT_OPEN
-        supported_features |= SUPPORT_CLOSE
-        supported_features |= SUPPORT_STOP
+        supported_features |= CoverEntityFeature.OPEN
+        supported_features |= CoverEntityFeature.CLOSE
+        supported_features |= CoverEntityFeature.STOP
         self._attr_supported_features = supported_features
         self._attr_device_class = CoverDeviceClass.BLIND
-        # Allowing to use the HA to emulate a sinlge remote controller for TDEF motors
-        self._attr_unique_id = "jarolift_" + serial + group
+        self._attr_unique_id = "jarolift_" + serial
 
     @property
     def serial(self):
@@ -112,19 +107,16 @@ class JaroliftCover(CoverEntity):
         """Return the current position of the cover.
         None is unknown, 0 is closed, 255 is fully open.
         """
-        returnVaule = None
         if self._isClosed == True:
-            returnVaule = 0
+            return 0
         elif self._isClosed == False:
-            """The old maximum value was 255"""
-            returnVaule = 100
-        _LOGGER.debug("Returning position value: %s for the entity: %s with name: %s, group: %s, serial: %s", returnVaule, self._attr_unique_id, self._name,self._group, self._serial)
-        return returnVaule
+            return 255
+        else:
+            return None
 
     async def async_close_cover(self, **kwargs):
         """Close the cover."""
         self._isClosed = True
-        _LOGGER.debug("Calling the function close for the entity: %s with name: %s, group: %s, serial: %s", self._attr_unique_id, self._name,self._group, self._serial)
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
@@ -134,7 +126,6 @@ class JaroliftCover(CoverEntity):
     async def async_open_cover(self, **kwargs):
         """Open the cover."""
         self._isClosed = False
-        _LOGGER.debug("Calling the function open for the entity: %s with name: %s, group: %s, serial: %s", self._attr_unique_id, self._name,self._group, self._serial)
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
@@ -144,7 +135,6 @@ class JaroliftCover(CoverEntity):
     async def async_stop_cover(self, **kwargs):
         """Stop the cover."""
         self._isClosed = None
-        _LOGGER.debug("Calling the function open for the entity: %s with name: %s, group: %s, serial: %s", self._attr_unique_id, self._name,self._group, self._serial)
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
