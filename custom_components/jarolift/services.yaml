@@ -12,6 +12,12 @@ send_command:
     serial:
       description: The serial of the addressed JARO lift
       example: '0x106aa01'
+    rep_count:
+      description: Number of times that the tramission is repeated without increasing counter
+      example: 4
+    rep_delay:
+      description: Delay in seconds between each transmission
+      example: 0.2
     button:
       description: The button that was pressed on the remote
       example: '0x2'
