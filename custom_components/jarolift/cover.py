@@ -21,15 +21,19 @@ import homeassistant.helpers.config_validation as cv
 CONF_COVERS = "covers"
 CONF_GROUP = "group"
 CONF_SERIAL = "serial"
+CONF_REP_COUNT = "repeat_count"
+CONF_REP_DELAY = "repeat_delay"
 
 _COVERS_SCHEMA = vol.All(
     cv.ensure_list,
     [
         vol.Schema(
             {
-                CONF_NAME: cv.string,
-                CONF_GROUP: cv.string,
-                CONF_SERIAL: cv.string,
+                vol.Required(CONF_NAME): cv.string,
+                vol.Required(CONF_GROUP): cv.string,
+                vol.Required(CONF_SERIAL): cv.string,
+                vol.Optional(CONF_REP_COUNT, default=0): cv.positive_int,
+                vol.Optional(CONF_REP_DELAY, default=0.2): cv.positive_float,
             }
         )
     ],
@@ -53,7 +57,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 
     for cover in covers_conf:
         covers.append(
-            JaroliftCover(cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], hass)
+            JaroliftCover(cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], cover[CONF_REP_COUNT], cover[CONF_REP_DELAY], hass)
         )
     add_devices(covers)
 
@@ -61,13 +65,16 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 class JaroliftCover(CoverEntity):
     """Representation a jarolift Cover."""
 
-    def __init__(self, name, group, serial, hass):
+    def __init__(self, name, group, serial, rep_count, rep_delay, hass):
         """Initialize the jarolift device."""
         self._name = name
         self._group = group
         self._serial = serial
+        self._rep_count = rep_count
+        self._rep_delay = rep_delay
         self._hass = hass
-        self._isClosed = None
+        self._isClosed = False
+        self._position = 50
         supported_features = 0
         #supported_features |= SUPPORT_SET_TILT_POSITION
         supported_features |= CoverEntityFeature.OPEN
@@ -105,41 +112,35 @@ class JaroliftCover(CoverEntity):
     @property
     def current_cover_position(self):
         """Return the current position of the cover.
-        None is unknown, 0 is closed, 255 is fully open.
+        None is unknown, 0 is closed, 100 is fully open.
         """
-        if self._isClosed == True:
-            return 0
-        elif self._isClosed == False:
-            return 255
-        else:
-            return None
+        return self._position
 
     async def async_close_cover(self, **kwargs):
         """Close the cover."""
         self._isClosed = True
-        await self._hass.services.async_call(
-            "jarolift",
-            "send_command",
-            {"group": self._group, "serial": self._serial, "button": "0x2"},
-        )
+        self._position = 0
+        await self.async_push_button( "0x2" )
 
     async def async_open_cover(self, **kwargs):
         """Open the cover."""
         self._isClosed = False
-        await self._hass.services.async_call(
-            "jarolift",
-            "send_command",
-            {"group": self._group, "serial": self._serial, "button": "0x8"},
-        )
+        self._position = 100
+        await self.async_push_button( "0x8" )
 
     async def async_stop_cover(self, **kwargs):
         """Stop the cover."""
-        self._isClosed = None
+        self._isClosed = False
+        self._position = 50
+        await self.async_push_button( "0x4" )
+
+    async def async_push_button( self, value ):
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
-            {"group": self._group, "serial": self._serial, "button": "0x4"},
+            {"group": self._group, "serial": self._serial, "rep_count": self._rep_count, "rep_delay": self._rep_delay, "button": value},
         )
+        self.async_schedule_update_ha_state(True)
 
 #    async def async_set_cover_tilt_position(self, **kwargs):
 #        """Drive the cover to tilt position"""

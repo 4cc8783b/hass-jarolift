@@ -1,9 +1,10 @@
 {
-    "domain": "jarolift",
-    "name": "Jarolift integration",
-    "dependencies": [],
-    "codeowners": [],
-    "requirements": [],
-    "iot_class": "assumed_state",
-    "version": "0.0.1"
-  }
+  "domain": "jarolift",
+  "name": "Jarolift integration",
+  "dependencies": [],
+  "codeowners": [],
+  "requirements": [],
+  "integration_type": "hub",
+  "iot_class": "assumed_state",
+  "version": "1.3.1"
+}

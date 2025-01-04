@@ -55,6 +55,9 @@ You can then use the new cover platform like this:
     - name: 'Livingroom Main Cover'
       group: '0x0001'
       serial: '0x116ea01'
+	  # The following two are optional
+	  repeat_count: 4	# number of times a command is sent - default = 0
+	  repeat_delay: 0.2 # delay between multiple transmissions - default = 0.2
 ```
 
 Make sure Home Assistant can write a file in the config directory. The integration will write one to keep
