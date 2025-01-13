@@ -34,7 +34,14 @@ configured.
 
 ### Get the integration
 
+## Manual installation
+
 Copy all files from custom_components/jarolift in this repo to your config custom_components/jarolift.
+
+## Via HACS
+
+1. Add this repository as HACS repository (type: integration)
+2. Search for 'jarolift' and install the integration
 
 ### Setup
 
@@ -58,10 +65,11 @@ You can then use the new cover platform like this:
       # The following two are optional
       repeat_count: 4	# number of times a command is sent - default = 0
       repeat_delay: 0.2 # delay in seconds between multiple transmissions - default = 0.2
+      reverse: False # Do reverse up and down commands. Useful if your cover closes on sending "up" and opens on sending "down".
 ```
 
-Make sure Home Assistant can write a file in the config directory. The integration will write one to keep
-track of the current count of command sent. This count is needed for the KeeLoq encryption.
+Make sure Home Assistant can write files in the config directory. The integration will write one to keep
+track of the current count of command sent per serial. This count is required for the KeeLoq encryption.
 
 Save the configuration file and restart Home Assistant.
 

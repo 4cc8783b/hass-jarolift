@@ -7,7 +7,6 @@ import voluptuous as vol
 
 from homeassistant.components.cover import (
     CoverEntityFeature,
-#    SUPPORT_SET_TILT_POSITION,
     PLATFORM_SCHEMA,
     CoverDeviceClass,
     CoverEntity,
@@ -23,6 +22,7 @@ CONF_GROUP = "group"
 CONF_SERIAL = "serial"
 CONF_REP_COUNT = "repeat_count"
 CONF_REP_DELAY = "repeat_delay"
+CONF_REVERSE = "reverse"
 
 _COVERS_SCHEMA = vol.All(
     cv.ensure_list,
@@ -34,6 +34,7 @@ _COVERS_SCHEMA = vol.All(
                 vol.Required(CONF_SERIAL): cv.string,
                 vol.Optional(CONF_REP_COUNT, default=0): cv.positive_int,
                 vol.Optional(CONF_REP_DELAY, default=0.2): cv.positive_float,
+                vol.Optional(CONF_REVERSE, default=False): cv.boolean
             }
         )
     ],
@@ -57,7 +58,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 
     for cover in covers_conf:
         covers.append(
-            JaroliftCover(cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], cover[CONF_REP_COUNT], cover[CONF_REP_DELAY], hass)
+            JaroliftCover(cover[CONF_NAME], cover[CONF_GROUP], cover[CONF_SERIAL], cover[CONF_REP_COUNT], cover[CONF_REP_DELAY], cover[CONF_REVERSE], hass)
         )
     add_devices(covers)
 
@@ -65,18 +66,22 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 class JaroliftCover(CoverEntity):
     """Representation a jarolift Cover."""
 
-    def __init__(self, name, group, serial, rep_count, rep_delay, hass):
+    code_down = "0x2"
+    code_stop = "0x4"
+    code_up   = "0x8"
+
+    def __init__(self, name, group, serial, rep_count, rep_delay, reversed, hass):
         """Initialize the jarolift device."""
         self._name = name
         self._group = group
         self._serial = serial
         self._rep_count = rep_count
         self._rep_delay = rep_delay
+        self._reversed = reversed
         self._hass = hass
         self._isClosed = False
         self._position = 50
         supported_features = 0
-        #supported_features |= SUPPORT_SET_TILT_POSITION
         supported_features |= CoverEntityFeature.OPEN
         supported_features |= CoverEntityFeature.CLOSE
         supported_features |= CoverEntityFeature.STOP
@@ -120,37 +125,35 @@ class JaroliftCover(CoverEntity):
         """Close the cover."""
         self._isClosed = True
         self._position = 0
-        await self.async_push_button( "0x2" )
+        actual_code = type(self).code_up if self._reversed else type(self).code_down
+        _LOGGER.debug("closing cover, sending %s (reversed=%s)", actual_code, self._reversed)
+        await self.async_push_button(actual_code)
 
     async def async_open_cover(self, **kwargs):
         """Open the cover."""
         self._isClosed = False
         self._position = 100
-        await self.async_push_button( "0x8" )
+        actual_code = type(self).code_down if self._reversed else type(self).code_up
+        _LOGGER.debug("opening cover, sending %s (reversed=%s)", actual_code, self._reversed)
+        await self.async_push_button(actual_code)
 
     async def async_stop_cover(self, **kwargs):
         """Stop the cover."""
         self._isClosed = False
         self._position = 50
-        await self.async_push_button( "0x4" )
+        _LOGGER.debug("closing cover")
+        await self.async_push_button(type(self).code_stop)
 
     async def async_push_button( self, value ):
         await self._hass.services.async_call(
             "jarolift",
             "send_command",
-            {"group": self._group, "serial": self._serial, "rep_count": self._rep_count, "rep_delay": self._rep_delay, "button": value},
+            {
+                "group": self._group,
+                "serial": self._serial,
+                "rep_count": self._rep_count,
+                "rep_delay": self._rep_delay,
+                "button": value
+            }
         )
         self.async_schedule_update_ha_state(True)
-
-#    async def async_set_cover_tilt_position(self, **kwargs):
-#        """Drive the cover to tilt position"""
-#        await self._hass.services.async_call(
-#            "jarolift",
-#            "send_command",
-#            {
-#                "group": self._group,
-#                "serial": self._serial,
-#                "button": "0x4",
-#                "hold": True,
-#            },
-#        )
