@@ -1,1 +1,3 @@
 custom_components/jarolift/__pycache__
+__pycache__/
+.pytest_cache/

@@ -1,41 +1,117 @@
 send_raw:
+  name: Send raw
   description: Send raw data to JARO lift
   fields:
     packet:
+      name: Packet
       description: The packet data to send
+      required: true
+      selector:
+        text:
 send_command:
+  name: Send command
   description: Send button press to JARO lift
   fields:
+    serial:
+      name: Serial
+      description: The serial of the addressed JARO lift
+      required: true
+      example: '0x106aa01'
+      selector:
+        text:
     group:
+      name: Group
       description: The JARO lift group to send the command to
       example: '0x0001'
-    serial:
-      description: The serial of the addressed JARO lift
-      example: '0x106aa01'
+      default: '0x0001'
+      selector:
+        text:
+    button:
+      name: Button
+      description: The button that was pressed on the remote (0x2 down, 0x4 stop, 0x8 up)
+      example: '0x2'
+      default: '0x2'
+      selector:
+        text:
     rep_count:
+      name: Repeat count
       description: Number of times that the transmission is repeated without increasing counter
       example: 4
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 20
+          mode: box
     rep_delay:
+      name: Repeat delay
       description: Delay in seconds between each transmission
       example: 0.2
-    button:
-      description: The button that was pressed on the remote
-      example: '0x2'
+      default: 0.2
+      selector:
+        number:
+          min: 0
+          max: 5
+          step: 0.1
+          unit_of_measurement: s
+          mode: box
+    hold:
+      name: Hold
+      description: Send the command as a long button press
+      default: false
+      selector:
+        boolean:
+    counter:
+      name: Counter
+      description: Rolling code counter to use (hex). 0 uses and increments the stored counter
+      example: '0x0000'
+      selector:
+        text:
 learn:
+  name: Learn
   description: Learn a new JARO lift
   fields:
+    serial:
+      name: Serial
+      description: The serial of the addressed JARO lift
+      required: true
+      example: '0x106aa01'
+      selector:
+        text:
     group:
+      name: Group
       description: The JARO lift group to send the command to
       example: '0x0001'
-    serial:
-      description: The serial of the addressed JARO lift
-      example: '0x106aa01'
+      default: '0x0001'
+      selector:
+        text:
+    counter:
+      name: Counter
+      description: Rolling code counter to use (hex). 0 uses and increments the stored counter
+      example: '0x0000'
+      selector:
+        text:
 clear:
+  name: Clear
   description: Clear previously learned JARO lift
   fields:
+    serial:
+      name: Serial
+      description: The serial of the addressed JARO lift
+      required: true
+      example: '0x106aa01'
+      selector:
+        text:
     group:
+      name: Group
       description: The JARO lift group to send the command to
       example: '0x0001'
-    serial:
-      description: The serial of the addressed JARO lift
-      example: '0x106aa01'
+      default: '0x0001'
+      selector:
+        text:
+    counter:
+      name: Counter
+      description: Rolling code counter to use (hex). 0 uses and increments the stored counter
+      example: '0x0000'
+      selector:
+        text:
