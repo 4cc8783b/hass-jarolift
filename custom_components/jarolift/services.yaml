@@ -2,6 +2,12 @@ send_raw:
   name: Send raw
   description: Send raw data to JARO lift
   fields:
+    config_entry_id:
+      name: Jarolift entry
+      description: Only needed when several Jarolift entries (remotes) are set up
+      selector:
+        config_entry:
+          integration: jarolift
     packet:
       name: Packet
       description: The packet data to send
@@ -12,6 +18,12 @@ send_command:
   name: Send command
   description: Send button press to JARO lift
   fields:
+    config_entry_id:
+      name: Jarolift entry
+      description: Only needed when several Jarolift entries (remotes) are set up
+      selector:
+        config_entry:
+          integration: jarolift
     serial:
       name: Serial
       description: The serial of the addressed JARO lift
@@ -71,6 +83,12 @@ learn:
   name: Learn
   description: Learn a new JARO lift
   fields:
+    config_entry_id:
+      name: Jarolift entry
+      description: Only needed when several Jarolift entries (remotes) are set up
+      selector:
+        config_entry:
+          integration: jarolift
     serial:
       name: Serial
       description: The serial of the addressed JARO lift
@@ -95,6 +113,12 @@ clear:
   name: Clear
   description: Clear previously learned JARO lift
   fields:
+    config_entry_id:
+      name: Jarolift entry
+      description: Only needed when several Jarolift entries (remotes) are set up
+      selector:
+        config_entry:
+          integration: jarolift
     serial:
       name: Serial
       description: The serial of the addressed JARO lift

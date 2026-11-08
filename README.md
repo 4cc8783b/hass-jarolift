@@ -12,8 +12,9 @@ was set up to track changes.
 
 ## Supported Home Assistant versions
 
-### Minimum HA version: 2022.2
-Older versions may be supported by tagged versions (see tags).
+### Minimum HA version: 2025.4
+Version 2.x is set up in the UI and uses config subentries. For older Home Assistant
+versions use version 1.4.x (see tags).
 
 ## KeeLoq Encryption
 
@@ -45,33 +46,40 @@ Copy all files from custom_components/jarolift in this repo to your config custo
 
 ### Setup
 
-Enter following lines to `configuration.yaml`
+Go to **Settings > Devices & services > Add integration > Jarolift** and enter:
 
-```yaml
-jarolift:
-  remote_entity_id: remote.broadlink_rm_proplus_remote # this id is from the device of the remote integration representing the remote to send command with
-  MSB: '0x12345678' # Most significant bits of the manufacturer key (**0x12345678 is not the correct value!**)
-  LSB: '0x87654321' # Least significant bits of the manufactorer key (**0x87654321 is not the correct value!**)
-```
-Manufacturer key can be found on pastebin (just google it)
+* the remote that sends the RF packets (e.g. `remote.broadlink_rm_proplus_remote`)
+* MSB and LSB of the manufacturer key (hex, e.g. `0x12345678`)
+* an optional delay between commands to different covers
 
-You can then use the new cover platform like this:
-```yaml
-- platform: jarolift
-  covers:
-    - name: 'Livingroom Main Cover'
-      group: '0x0001'
-      serial: '0x116ea01'
-      # The following two are optional
-      repeat_count: 4	# number of times a command is sent - default = 0
-      repeat_delay: 0.2 # delay in seconds between multiple transmissions - default = 0.2
-      reverse: False # Do reverse up and down commands. Useful if your cover closes on sending "up" and opens on sending "down".
-```
+Then add your covers with **Add cover** on the Jarolift integration page. For each cover
+enter name, serial and group (hex), and optionally repeat count, repeat delay and
+"reverse" (for covers that close on "up"). You can learn the cover right away.
 
-Make sure Home Assistant can write files in the config directory. The integration will write one to keep
-track of the current count of command sent per serial. This count is required for the KeeLoq encryption.
+Every cover is a device with these entities:
 
-Save the configuration file and restart Home Assistant.
+| Entity | Purpose |
+|---|---|
+| Cover | Open, close, stop. With travel times also set position |
+| Learn | Teach the cover (put the motor into learning mode first) |
+| Clear learned remote | Remove this remote from the cover (disabled by default) |
+| Intermediate position | Long press of stop: moves to the programmed intermediate position, if your motor has one |
+| Travel time up / down | Seconds from one end to the other. When both are set, the position is estimated from the travel time |
+| Rolling code counter | Next KeeLoq counter of the serial (diagnostic) |
+| Last command | When and which command was sent last (diagnostic) |
+
+The state is assumed: the covers send no feedback, so Home Assistant shows what was sent last.
+
+### Migrating from version 1.x (YAML)
+
+On the first start with version 2.x an existing `jarolift:` configuration and all
+`cover: - platform: jarolift` covers are imported into the UI once. The cover entities keep
+their entity IDs, and the rolling code counters are taken over from the `counter_0x….txt`
+files (which are renamed to `….txt.migrated`). Your covers don't have to be learned again.
+Afterwards remove the YAML configuration as the repair notice says.
+
+Rolling code counters are now stored in `.storage/jarolift.<entry id>`. Don't go back to
+version 1.x after the migration: it would send old rolling codes which the covers ignore.
 
 ## Provided services
 The integration provides following services:
@@ -80,7 +88,9 @@ The integration provides following services:
 * jarolift.send_command
 * jarolift.send_raw
 
-Those are documented in the [services.yaml](https://github.com/4cc8783b/hass-jarolift/blob/main/custom_components/jarolift/services.yaml).
+Those are documented in the [services.yaml](custom_components/jarolift/services.yaml).
+`serial` is required. Commands sent with `jarolift.send_command` also update the state of a
+configured cover with the same serial and group.
 
 ## Learn covers
 

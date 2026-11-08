@@ -1,0 +1,136 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Jarolift",
+        "description": "Jarolift-Befehle werden mit KeeLoq verschlüsselt und über eine Fernbedienung in Home Assistant gesendet, zum Beispiel eine Broadlink RM Pro.",
+        "data": {
+          "remote_entity_id": "Fernbedienung",
+          "MSB": "Herstellerschlüssel MSB",
+          "LSB": "Herstellerschlüssel LSB",
+          "delay": "Pause zwischen Rollläden"
+        },
+        "data_description": {
+          "remote_entity_id": "Fernbedienung, die die Funkpakete sendet.",
+          "MSB": "Obere 32 Bit des Herstellerschlüssels, hexadezimal (0x…).",
+          "LSB": "Untere 32 Bit des Herstellerschlüssels, hexadezimal (0x…).",
+          "delay": "Mindestpause nach einem Befehl, bevor der nächste Rollladen einen bekommt."
+        }
+      },
+      "reconfigure": {
+        "title": "Jarolift",
+        "data": {
+          "remote_entity_id": "Fernbedienung",
+          "MSB": "Herstellerschlüssel MSB",
+          "LSB": "Herstellerschlüssel LSB",
+          "delay": "Pause zwischen Rollläden"
+        }
+      }
+    },
+    "error": {
+      "invalid_key": "Bitte einen 32-Bit-Hexwert eingeben, z. B. 0x12345678.",
+      "already_configured": "Diese Fernbedienung wird bereits von einem anderen Jarolift-Eintrag verwendet."
+    },
+    "abort": {
+      "already_configured": "Diese Fernbedienung ist bereits eingerichtet.",
+      "reconfigure_successful": "Die Konfiguration wurde aktualisiert."
+    }
+  },
+  "config_subentries": {
+    "cover": {
+      "entry_type": "Rollladen",
+      "initiate_flow": {
+        "user": "Rollladen hinzufügen"
+      },
+      "step": {
+        "user": {
+          "title": "Rollladen hinzufügen",
+          "data": {
+            "name": "Name",
+            "serial": "Serial",
+            "group": "Gruppe",
+            "repeat_count": "Wiederholungen",
+            "repeat_delay": "Pause zwischen Wiederholungen",
+            "reverse": "Auf/Ab vertauschen"
+          },
+          "data_description": {
+            "serial": "Serial der virtuellen Fernbedienung, hexadezimal (z. B. 0x106aa01). Mehrere Rollläden können sich eine Serial teilen, wenn sie unterschiedliche Gruppen haben.",
+            "group": "Kanal-Bits, hexadezimal (z. B. 0x0001).",
+            "repeat_count": "Zusätzliche Sendungen pro Befehl, für Rollläden mit schlechtem Empfang.",
+            "repeat_delay": "Pause zwischen den wiederholten Sendungen.",
+            "reverse": "Auf und Ab tauschen, für Rollläden, die bei „Auf“ schließen."
+          }
+        },
+        "learn": {
+          "title": "{name} anlernen",
+          "description": "Um den Rollladen jetzt anzulernen, versetze den Motor in den Lernmodus (wie bei einer originalen Jarolift-Fernbedienung), setze das Häkchen und bestätige. Du kannst ihn auch später über die Taste „Anlernen“ des Rollladens anlernen.",
+          "data": {
+            "learn_now": "Jetzt anlernen"
+          }
+        },
+        "reconfigure": {
+          "title": "Rollladen ändern",
+          "description": "Wenn du Serial oder Gruppe änderst, muss der Rollladen neu angelernt werden.",
+          "data": {
+            "name": "Name",
+            "serial": "Serial",
+            "group": "Gruppe",
+            "repeat_count": "Wiederholungen",
+            "repeat_delay": "Pause zwischen Wiederholungen",
+            "reverse": "Auf/Ab vertauschen"
+          }
+        }
+      },
+      "error": {
+        "invalid_serial": "Bitte einen Hexwert bis 0x0FFFFFFF eingeben.",
+        "invalid_group": "Bitte einen Hexwert bis 0xFFFF eingeben.",
+        "already_configured": "Ein Rollladen mit dieser Serial und Gruppe existiert bereits.",
+        "send_failed": "Senden fehlgeschlagen. Prüfe die Fernbedienung und versuche es erneut, oder überspringe das Anlernen."
+      },
+      "abort": {
+        "reconfigure_successful": "Der Rollladen wurde aktualisiert."
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "learn": { "name": "Anlernen" },
+      "clear": { "name": "Anlernung löschen" },
+      "intermediate": { "name": "Zwischenposition" }
+    },
+    "sensor": {
+      "counter": { "name": "Rolling-Code-Zähler" },
+      "last_command": {
+        "name": "Letzter Befehl",
+        "state_attributes": {
+          "command": {
+            "name": "Befehl",
+            "state": {
+              "open": "Öffnen",
+              "close": "Schließen",
+              "stop": "Stopp",
+              "intermediate": "Zwischenposition",
+              "learn": "Anlernen",
+              "clear": "Anlernung löschen"
+            }
+          }
+        }
+      }
+    },
+    "number": {
+      "travel_time_up": { "name": "Laufzeit auf" },
+      "travel_time_down": { "name": "Laufzeit zu" }
+    }
+  },
+  "exceptions": {
+    "no_hub": { "message": "Es ist kein Jarolift-Eintrag eingerichtet." },
+    "multiple_hubs": { "message": "Es sind mehrere Jarolift-Einträge eingerichtet, bitte einen über config_entry_id auswählen." },
+    "position_unknown": { "message": "Die Position ist unbekannt. Bitte den Rollladen zuerst ganz öffnen oder schließen." }
+  },
+  "issues": {
+    "deprecated_yaml": {
+      "title": "Jarolift-YAML-Konfiguration wurde übernommen",
+      "description": "Deine `jarolift:`-Konfiguration und die Rollläden unter `cover: - platform: jarolift` wurden in die Oberfläche übernommen. Entferne sie aus der configuration.yaml und starte Home Assistant neu. Die Rollläden werden jetzt unter Einstellungen > Geräte & Dienste > Jarolift verwaltet."
+    }
+  }
+}
