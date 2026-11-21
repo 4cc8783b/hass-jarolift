@@ -1,0 +1,136 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Jarolift",
+        "description": "Jarolift commands are KeeLoq encrypted and sent through a Home Assistant remote, for example a Broadlink RM Pro.",
+        "data": {
+          "remote_entity_id": "Remote",
+          "MSB": "Manufacturer key MSB",
+          "LSB": "Manufacturer key LSB",
+          "delay": "Delay between covers"
+        },
+        "data_description": {
+          "remote_entity_id": "Remote that sends the RF packets.",
+          "MSB": "Most significant 32 bits of the manufacturer key, hex (0x…).",
+          "LSB": "Least significant 32 bits of the manufacturer key, hex (0x…).",
+          "delay": "Minimum pause after a command before the next cover gets one."
+        }
+      },
+      "reconfigure": {
+        "title": "Jarolift",
+        "data": {
+          "remote_entity_id": "Remote",
+          "MSB": "Manufacturer key MSB",
+          "LSB": "Manufacturer key LSB",
+          "delay": "Delay between covers"
+        }
+      }
+    },
+    "error": {
+      "invalid_key": "Enter a 32 bit hex value, e.g. 0x12345678.",
+      "already_configured": "This remote is already used by another Jarolift entry."
+    },
+    "abort": {
+      "already_configured": "This remote is already configured.",
+      "reconfigure_successful": "The configuration was updated."
+    }
+  },
+  "config_subentries": {
+    "cover": {
+      "entry_type": "Cover",
+      "initiate_flow": {
+        "user": "Add cover"
+      },
+      "step": {
+        "user": {
+          "title": "Add cover",
+          "data": {
+            "name": "Name",
+            "serial": "Serial",
+            "group": "Group",
+            "repeat_count": "Repeat count",
+            "repeat_delay": "Repeat delay",
+            "reverse": "Reverse up/down"
+          },
+          "data_description": {
+            "serial": "Serial of the virtual remote, hex (e.g. 0x106aa01). Covers can share a serial if they use different groups.",
+            "group": "Channel bits, hex (e.g. 0x0001).",
+            "repeat_count": "Extra transmissions of each command, for covers with bad reception.",
+            "repeat_delay": "Pause between the repeated transmissions.",
+            "reverse": "Swap up and down, for covers that close on \"up\"."
+          }
+        },
+        "learn": {
+          "title": "Learn {name}",
+          "description": "To teach the cover now, put the motor into learning mode (as with an original Jarolift remote), tick the box and submit. You can also learn it later with the \"Learn\" button of the cover.",
+          "data": {
+            "learn_now": "Learn now"
+          }
+        },
+        "reconfigure": {
+          "title": "Change cover",
+          "description": "If you change serial or group, the cover has to be learned again.",
+          "data": {
+            "name": "Name",
+            "serial": "Serial",
+            "group": "Group",
+            "repeat_count": "Repeat count",
+            "repeat_delay": "Repeat delay",
+            "reverse": "Reverse up/down"
+          }
+        }
+      },
+      "error": {
+        "invalid_serial": "Enter a hex value up to 0x0FFFFFFF.",
+        "invalid_group": "Enter a hex value up to 0xFFFF.",
+        "already_configured": "A cover with this serial and group already exists.",
+        "send_failed": "Sending failed. Check the remote and try again, or skip learning."
+      },
+      "abort": {
+        "reconfigure_successful": "The cover was updated."
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "learn": { "name": "Learn" },
+      "clear": { "name": "Clear learned remote" },
+      "intermediate": { "name": "Intermediate position" }
+    },
+    "sensor": {
+      "counter": { "name": "Rolling code counter" },
+      "last_command": {
+        "name": "Last command",
+        "state_attributes": {
+          "command": {
+            "name": "Command",
+            "state": {
+              "open": "Open",
+              "close": "Close",
+              "stop": "Stop",
+              "intermediate": "Intermediate position",
+              "learn": "Learn",
+              "clear": "Clear"
+            }
+          }
+        }
+      }
+    },
+    "number": {
+      "travel_time_up": { "name": "Travel time up" },
+      "travel_time_down": { "name": "Travel time down" }
+    }
+  },
+  "exceptions": {
+    "no_hub": { "message": "No Jarolift entry is set up." },
+    "multiple_hubs": { "message": "Several Jarolift entries are set up, select one with config_entry_id." },
+    "position_unknown": { "message": "The position is unknown. Open or close the cover completely first." }
+  },
+  "issues": {
+    "deprecated_yaml": {
+      "title": "Jarolift YAML configuration was imported",
+      "description": "Your `jarolift:` configuration and the `cover: - platform: jarolift` covers were imported into the UI. Remove them from configuration.yaml and restart Home Assistant. Covers are now managed under Settings > Devices & services > Jarolift."
+    }
+  }
+}

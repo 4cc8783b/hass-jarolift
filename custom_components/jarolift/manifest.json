@@ -1,10 +1,13 @@
 {
   "domain": "jarolift",
-  "name": "Jarolift integration",
-  "dependencies": [],
+  "name": "Jarolift",
+  "config_flow": true,
+  "documentation": "https://github.com/4cc8783b/hass-jarolift",
+  "issue_tracker": "https://github.com/4cc8783b/hass-jarolift/issues",
+  "dependencies": ["remote"],
   "codeowners": [],
   "requirements": [],
   "integration_type": "hub",
   "iot_class": "assumed_state",
-  "version": "1.4.0"
+  "version": "2.0.0"
 }
