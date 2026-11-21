@@ -44,8 +44,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     }
 )
 
-DEPENDENCIES = ["jarolift"]
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -85,6 +83,8 @@ class JaroliftCover(CoverEntity):
         supported_features |= CoverEntityFeature.STOP
         self._attr_supported_features = supported_features
         self._attr_device_class = CoverDeviceClass.BLIND
+        # No feedback from the covers: state is only what we last sent
+        self._attr_assumed_state = True
         self._attr_unique_id = "jarolift_" + serial
 
     @property
@@ -139,7 +139,7 @@ class JaroliftCover(CoverEntity):
         """Stop the cover."""
         self._isClosed = False
         self._position = 50
-        _LOGGER.debug("closing cover")
+        _LOGGER.debug("stopping cover")
         await self.async_push_button(type(self).code_stop)
 
     async def async_push_button( self, value ):
@@ -154,4 +154,4 @@ class JaroliftCover(CoverEntity):
                 "button": value
             }
         )
-        self.async_schedule_update_ha_state(True)
+        self.async_write_ha_state()
